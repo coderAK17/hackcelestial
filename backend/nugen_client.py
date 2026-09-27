@@ -230,9 +230,20 @@ async def query_nugen_chat(
         except Exception as e:
             print(f"Nugen remote inference failed: {e}, falling back to domain-augmented reasoning.")
 
-    # Domain Knowledge Augmented Fallback (When API key is pending or model is training)
-    # Uses the authentic statistics directly generated from flights.csv
     user_query = messages[-1]["content"] if messages else ""
+    try:
+        from .ai_engine import is_off_topic_query, get_domain_restriction_response
+        is_off_topic, category = is_off_topic_query(user_query)
+        if is_off_topic:
+            return {
+                "content": get_domain_restriction_response(category),
+                "confidence_score": 100.0,
+                "model": "Voyage-Domain-Guard",
+                "provider": "VOYAGE_DOMAIN_GUARD"
+            }
+    except Exception:
+        pass
+
     return generate_domain_grounded_answer(user_query, state)
 
 def generate_domain_grounded_answer(query: str, state: Dict[str, Any]) -> Dict[str, Any]:

@@ -70,8 +70,8 @@ CRITICAL INSTRUCTIONS:
 
 4. STRICT DOMAIN RESTRICTIONS & BOUNDARIES (MANDATORY):
    - You are exclusively dedicated to travel resilience, flight/train disruptions, tickets, transit, and passenger rights.
-   - You are STRICTLY FORBIDDEN from generating code for games (e.g. Python games, Snake, Tic-Tac-Toe, arcade games, pygame) or unrelated non-travel software.
-   - If asked for game code or off-topic programming, politely refuse and clarify your travel resilience focus.
+   - You are STRICTLY FORBIDDEN from generating code, scripts, math solutions, calculus equations, essays, or answering off-topic non-travel tasks.
+   - If asked for non-travel code, math, homework, or general trivia, politely refuse and clarify your travel resilience focus.
 
 Tone: Professional, precise, structured, empathetic, and actionable.
 """
@@ -110,6 +110,136 @@ def is_restricted_game_query(query: str) -> bool:
             return True
 
     return False
+
+def is_off_topic_query(query: str) -> Tuple[bool, str]:
+    """
+    Evaluates if user prompt is outside Voyage AI's travel resilience & passenger rights domain.
+    Returns (is_off_topic: bool, category: str).
+    Categories: 'code', 'math', 'general'.
+    """
+    if not query or not isinstance(query, str):
+        return False, ""
+    
+    q = query.lower().strip()
+    if not q:
+        return False, ""
+
+    # Explicit Travel Context Keywords — if present alongside travel intent, treat as domain inquiry
+    travel_explicit_keywords = [
+        "flight", "flights", "fight", "flite", "plane", "planes", "airline", "airlines",
+        "train", "trains", "rail", "railway", "irctc", "pnr", "ticket", "tickets",
+        "booking", "itinerary", "voyage", "dgca", "eu261", "us dot", "tdr", "refund",
+        "compensation", "disruption", "delay", "delays", "cancelled", "cancellation",
+        "mumbai", "delhi", "bengaluru", "kolkata", "hyderabad", "chennai", "jaipur",
+        "terminal", "airport", "station", "platform", "transit", "corridor", "slack",
+        "alpine", "zermatt", "london", "zurich", "visp", "sbb", "ba 712", "indigo",
+        "air india", "akasa", "vande bharat", "rajdhani", "shatabdi", "seat", "baggage",
+        "checkin", "check-in", "boarding", "deboarding", "scheduled", "departure", "arrival", "route"
+    ]
+
+    # 1. CODE / PROGRAMMING GENERATION DETECTOR
+    code_phrases = [
+        "write code", "generate code", "code for", "write a program", "write a script",
+        "python code", "java code", "c++ code", "c# code", "javascript code", "typescript code",
+        "html code", "css code", "react code", "sql query", "write a function", "write a class",
+        "binary search", "bubble sort", "quick sort", "linked list", "fibonacci", "factorial",
+        "prime numbers", "snake game", "tic tac toe", "tictactoe", "calculator app",
+        "web scraper", "bot script", "python script", "bash script", "powershell script",
+        "create a website", "build a website", "develop an app", "coding tutorial",
+        "write an algorithm", "solve leetcode", "code in python", "code in java", "code in c++"
+    ]
+    for cp in code_phrases:
+        if cp in q:
+            if not any(tk in q for tk in ["travel", "flight", "train", "pnr", "irctc", "dgca", "disruption", "refund", "voyage"]):
+                return True, "code"
+
+    # Programming language / term + code / write action verb
+    prog_languages = ["python", "java", "c++", "c#", "rust", "golang", "php", "javascript", "typescript", "react", "vue", "angular", "node", "pygame", "html", "css", "sql"]
+    action_verbs = ["write", "code", "create", "build", "develop", "implement", "generate", "make", "solve", "script"]
+    has_lang = any(re.search(rf"\b{re.escape(pl)}\b", q) for pl in prog_languages)
+    has_action = any(re.search(rf"\b{re.escape(av)}\b", q) for av in action_verbs)
+    if has_lang and has_action:
+        if not any(tk in q for tk in ["travel", "flight", "train", "pnr", "irctc", "dgca", "disruption", "refund", "voyage"]):
+            return True, "code"
+
+    # 2. MATHEMATICAL STUFF / EQUATIONS / CALCULUS DETECTOR
+    math_phrases = [
+        "solve equation", "solve math", "solve calculus", "math problem", "math question",
+        "derivative of", "integral of", "calculate equation", "algebra problem",
+        "trigonometry", "pythagorean", "quadratic formula", "matrix multiplication",
+        "solve 2x", "solve 3x", "solve 4x", "solve 5x", "solve x", "find x in",
+        "evaluate expression", "solve expression", "math homework", "calculus problem",
+        "differential equation", "linear algebra"
+    ]
+    for mp in math_phrases:
+        if mp in q:
+            if not any(tk in q for tk in ["refund", "fare", "delay", "ticket", "cost", "hours", "hrs", "mins", "compensation", "pnr", "slack"]):
+                return True, "math"
+
+    # Mathematical calculations / equations regex (e.g. "solve 5x + 10 = 50", "calculate 125 * 45", "what is 250 / 5")
+    if re.search(r'\b(solve|calculate|eval|evaluate|compute)\b.*\b(\d+\s*[\+\-\*\/\^\=]\s*\d+|\d*x\s*[\+\-\=])', q):
+        if not any(tk in q for tk in ["refund", "fare", "delay", "ticket", "cost", "hours", "hrs", "mins", "compensation", "pnr", "slack", "index"]):
+            return True, "math"
+
+    # Simple arithmetic questions (e.g. "what is 15 + 25", "calculate 99 * 3")
+    if re.search(r'^(what\s+is|calculate|eval|compute)?\s*\d+\s*[\+\-\*\/]\s*\d+\s*\??$', q):
+        if not any(tk in q for tk in ["refund", "fare", "delay", "ticket", "cost", "hours", "hrs", "mins", "compensation", "pnr"]):
+            return True, "math"
+
+    # 3. GAME CODE & UNRELATED NON-TRAVEL TASKS
+    if is_restricted_game_query(q):
+        return True, "code"
+
+    off_topic_tasks = [
+        "write an essay", "write a story", "write a poem", "tell me a joke",
+        "recipe for", "how to cook", "who won the", "capital of france",
+        "who is president", "movie review", "summarize book", "tell me about yourself",
+        "write a letter", "generate an article", "write a blog"
+    ]
+    for ott in off_topic_tasks:
+        if ott in q:
+            if not any(tk in q for tk in travel_explicit_keywords):
+                return True, "general"
+
+    return False, ""
+
+def get_domain_restriction_response(category: str) -> str:
+    """
+    Returns a clear, polite, structured domain boundary refusal response.
+    """
+    if category == "code":
+        return (
+            "### 🛡️ Voyage AI Domain Guard\n\n"
+            "I am **Voyage AI**, an autonomous AI concierge dedicated exclusively to **travel disruption resilience, flight & train telemetry, and statutory passenger rights** under DGCA CAR Section 3, EU261, US DOT, and IRCTC.\n\n"
+            "I have a **domain restriction** and cannot generate software code, scripts, algorithms, or programming tutorials for non-travel applications.\n\n"
+            "#### ✈️ How I can assist you with travel:\n"
+            "- **Flight & Train Delay Analytics**: Track live operational status and downstream connection risk.\n"
+            "- **Statutory Passenger Rights**: Calculate cash refunds, compensation, and meal entitlements.\n"
+            "- **Multi-Modal Recovery Plans**: Recommend alternative air, rail, metro, or road connections.\n\n"
+            "*Please let me know if you would like help with an upcoming flight, train, or travel disruption!*"
+        )
+    elif category == "math":
+        return (
+            "### 🛡️ Voyage AI Domain Guard\n\n"
+            "I am **Voyage AI**, an autonomous AI concierge dedicated exclusively to **travel disruption resilience, flight & train telemetry, and statutory passenger rights**.\n\n"
+            "I cannot solve general math homework, algebra, calculus, or scientific equations unrelated to travel.\n\n"
+            "#### ✈️ How I can assist you with travel calculations:\n"
+            "- **Statutory Compensation**: Calculate mandatory DGCA CAR Section 3 & EU261 cash payouts based on delay hours.\n"
+            "- **IRCTC TDR Refund Calculation**: Compute 100% full fare refund eligibility for delayed train journeys.\n"
+            "- **Connection Slack Computation**: Evaluate Critical Path Method (CPM) connection windows.\n\n"
+            "*Please share your flight or train details to calculate disruption compensation or fare refunds!*"
+        )
+    else:
+        return (
+            "### 🛡️ Voyage AI Domain Guard\n\n"
+            "I am **Voyage AI**, an autonomous AI concierge dedicated exclusively to **travel disruption resilience, flight & train telemetry, and statutory passenger rights**.\n\n"
+            "I cannot assist with general off-topic tasks (such as general essays, non-travel writing, trivia, or non-travel queries).\n\n"
+            "#### ✈️ How I can assist you:\n"
+            "- **Flight & Train Telemetry**: Search schedules, check live status, and monitor delay risk.\n"
+            "- **Passenger Rights & Refunds**: File statutory refund claims under DGCA, IRCTC, EU261, or US DOT.\n"
+            "- **Multi-Modal Route Optimization**: Plan backup connections across air, rail, and road.\n\n"
+            "*Please let me know how I can help with your travel itinerary!*"
+        )
 
 try:
     from dotenv import load_dotenv
@@ -384,22 +514,15 @@ def extract_route_pair(q_text: str) -> tuple[str, str]:
     return "", ""
 
 def call_expert_engine(state: AgentState) -> AgentState:
-    """High-intelligence local fallback that understands travel laws, writes code, and extracts disruptions."""
+    """High-intelligence local fallback that understands travel laws and extracts disruptions."""
     query = state["user_query"].strip()
     lower = query.lower()
 
-    if is_restricted_game_query(query):
-        state["response"] = (
-            "### 🛡️ Voyage AI Domain Restriction Notice\n\n"
-            "I am **Voyage AI**, an intelligent assistant dedicated exclusively to **travel disruption resilience, flight & train telemetry, and passenger rights** under DGCA CAR Section 3, EU261, US DOT, and IRCTC.\n\n"
-            "I have a **domain restriction** and cannot generate code for games (such as Python games, arcade games, or entertainment software).\n\n"
-            "#### How I can assist you:\n"
-            "- **Flight & Train Delay Analysis**: Track real-time status and downstream connection risk.\n"
-            "- **Passenger Rights & Compensation**: Calculate statutory cash refunds and meal entitlements.\n"
-            "- **Multi-Modal Recovery**: Recommend fastest or lowest-cost alternatives across air, rail, metro, and road transit.\n\n"
-            "Please let me know if you would like help with an upcoming flight, train, or travel disruption!"
-        )
-        state["provider"] = "Voyage AI Engine"
+    is_off_topic, category = is_off_topic_query(query)
+    if is_off_topic:
+        state["response"] = get_domain_restriction_response(category)
+        state["provider"] = "Voyage Domain Guard"
+        return state
     # Case 0a: User asks about refund claims / dispute status
     if any(k in lower for k in ["claim", "claims", "refund claim", "filed claim", "claim receipt", "dispute", "claim status"]):
         db_claims = get_all_refund_claims()
@@ -1056,20 +1179,13 @@ def run_ai_chat(
     """
     query = (user_query or (messages[-1]["content"] if messages else "")).strip()
 
-    # Domain restriction check: block game code generation
-    if is_restricted_game_query(query):
+    # Domain restriction check: block off-topic code generation, math problem solving, and general non-travel tasks
+    is_off_topic, category = is_off_topic_query(query)
+    if is_off_topic:
         return {
-            "reply": (
-                "### 🛡️ Voyage AI Domain Restriction Notice\n\n"
-                "I am **Voyage AI**, an intelligent assistant dedicated exclusively to **travel disruption resilience, flight & train telemetry, and passenger rights** under DGCA CAR Section 3, EU261, US DOT, and IRCTC.\n\n"
-                "I have a **domain restriction** and cannot generate code for games (such as Python games, arcade games, or entertainment software).\n\n"
-                "#### How I can assist you:\n"
-                "- **Flight & Train Delay Analysis**: Track real-time status and downstream connection risk.\n"
-                "- **Passenger Rights & Compensation**: Calculate statutory cash refunds and meal entitlements.\n"
-                "- **Multi-Modal Recovery**: Recommend fastest or lowest-cost alternatives across air, rail, metro, and road transit.\n\n"
-                "Please let me know if you would like help with an upcoming flight, train, or travel disruption!"
-            ),
-            "provider": "Voyage AI Engine",
+            "reply": get_domain_restriction_response(category),
+            "provider": "Voyage Domain Guard",
+            "model": "Domain-Restricted",
             "success": True
         }
 
