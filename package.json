@@ -1,0 +1,8 @@
+{
+  "name": "hackcelestial-app",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && cd .. && node -e \"require('fs').cpSync('frontend/dist', 'dist', {recursive: true})\""
+  }
+}
