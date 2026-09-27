@@ -217,47 +217,38 @@ export default function App() {
 
       {/* 2. DEDICATED ROUTE: /booking */}
       {currentRoute === '/booking' && (
-        <>
-          <BookingPage
-            user={user}
-            itinerary={itinerary}
-            activeDisruption={activeDisruption}
-            onNavigate={handleNavigate}
-            onSimulateAlpine={() => handleSimulateDisruption()}
-            t={t}
-          />
-          <Footer />
-        </>
+        <BookingPage
+          user={user}
+          itinerary={itinerary}
+          activeDisruption={activeDisruption}
+          onNavigate={handleNavigate}
+          onSimulateAlpine={() => handleSimulateDisruption()}
+          t={t}
+        />
       )}
 
       {/* 3. DEDICATED ROUTE: /profile */}
       {currentRoute === '/profile' && (
-        <>
-          <ProfilePage
-            user={user}
-            onNavigate={handleNavigate}
-            onLogout={() => { setUser(null); handleNavigate('/'); }}
-            t={t}
-          />
-          <Footer />
-        </>
+        <ProfilePage
+          user={user}
+          onNavigate={handleNavigate}
+          onLogout={() => { setUser(null); handleNavigate('/'); }}
+          t={t}
+        />
       )}
 
       {/* 4. DEDICATED ROUTE: /disruption (Disruption Resolver) */}
       {currentRoute === '/disruption' && (
-        <>
-          <DisruptionPage
-            user={user}
-            itinerary={itinerary}
-            activeDisruption={activeDisruption}
-            onNavigate={handleNavigate}
-            onSimulateAlpine={handleSimulateDisruption}
-            onResetDisruption={handleResetItinerary}
-            onOpenSaga={handleOpenSagaModal}
-            t={t}
-          />
-          <Footer />
-        </>
+        <DisruptionPage
+          user={user}
+          itinerary={itinerary}
+          activeDisruption={activeDisruption}
+          onNavigate={handleNavigate}
+          onSimulateAlpine={handleSimulateDisruption}
+          onResetDisruption={handleResetItinerary}
+          onOpenSaga={handleOpenSagaModal}
+          t={t}
+        />
       )}
 
       {/* 5. MAIN ROUTE: / (Landing Page with 3D Peeled Sheet & Full Platform) */}
