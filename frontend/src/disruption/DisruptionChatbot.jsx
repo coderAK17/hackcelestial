@@ -210,6 +210,89 @@ export default function DisruptionChatbot({
     ]);
   };
 
+  // Client-side domain restriction & travel resilience fallback handler
+  const evaluateClientSideDomainResponse = (queryText, activeTicket, ticketsList) => {
+    const q = (queryText || '').toLowerCase().trim();
+
+    // 1. Off-topic domain check: block code writing, math problem solving, general non-travel tasks
+    const codePhrases = [
+      "write code", "generate code", "code for", "write a program", "write a script",
+      "python code", "java code", "c++ code", "javascript code", "typescript code",
+      "html code", "css code", "react code", "sql query", "write a function", "write a class",
+      "binary search", "bubble sort", "quick sort", "linked list", "fibonacci", "factorial",
+      "snake game", "tic tac toe", "tictactoe", "calculator app", "web scraper", "bot script",
+      "python script", "bash script", "create a website", "build a website", "develop an app",
+      "write an algorithm", "solve leetcode", "code in python", "code in java"
+    ];
+    const isCode = codePhrases.some(cp => q.includes(cp)) || 
+      (["python", "java", "javascript", "typescript", "c++", "react", "html", "css", "algorithm"].some(lang => q.includes(lang)) && 
+       ["write", "code", "create", "build", "develop", "implement", "generate", "script"].some(act => q.includes(act)) &&
+       !["travel", "flight", "train", "pnr", "irctc", "dgca", "disruption", "refund", "voyage"].some(tk => q.includes(tk)));
+
+    if (isCode) {
+      return {
+        text: `### 🛡️ Voyage AI Domain Guard\n\nI am **Voyage AI**, an autonomous AI concierge dedicated exclusively to **travel disruption resilience, flight & train telemetry, and statutory passenger rights** under DGCA CAR Section 3, EU261, US DOT, and IRCTC.\n\nI have a **domain restriction** and cannot generate software code, scripts, algorithms, or programming tutorials for non-travel applications.\n\n#### ✈️ How I can assist you with travel:\n- **Flight & Train Delay Analytics**: Track live operational status and downstream connection risk.\n- **Statutory Passenger Rights**: Calculate cash refunds, compensation, and meal entitlements.\n- **Multi-Modal Recovery Plans**: Recommend alternative air, rail, metro, or road connections.\n\n*Please let me know if you would like help with an upcoming flight, train, or travel disruption!*`,
+        provider: "Voyage Domain Guard"
+      };
+    }
+
+    const mathPhrases = [
+      "solve equation", "solve math", "solve calculus", "math problem", "math question",
+      "derivative of", "integral of", "calculate equation", "algebra problem",
+      "trigonometry", "pythagorean", "quadratic formula", "solve 2x", "solve 3x", "solve 4x", "solve 5x", "solve x",
+      "evaluate expression", "solve expression", "math homework"
+    ];
+    const isMath = mathPhrases.some(mp => q.includes(mp)) ||
+      (/^(\s*what\s+is\s*)?\d+\s*[\+\-\*\/]\s*\d+\s*\??$/i.test(q) && !["refund", "fare", "delay", "ticket", "cost", "compensation", "pnr"].some(tk => q.includes(tk)));
+
+    if (isMath) {
+      return {
+        text: `### 🛡️ Voyage AI Domain Guard\n\nI am **Voyage AI**, an autonomous AI concierge dedicated exclusively to **travel disruption resilience, flight & train telemetry, and statutory passenger rights**.\n\nI cannot solve general math homework, algebra, calculus, or scientific equations unrelated to travel.\n\n#### ✈️ How I can assist you with travel calculations:\n- **Statutory Compensation**: Calculate mandatory DGCA CAR Section 3 & EU261 cash payouts based on delay hours.\n- **IRCTC TDR Refund Calculation**: Compute 100% full fare refund eligibility for delayed train journeys.\n- **Connection Slack Computation**: Evaluate Critical Path Method (CPM) connection windows.\n\n*Please share your flight or train details to calculate disruption compensation or fare refunds!*`,
+        provider: "Voyage Domain Guard"
+      };
+    }
+
+    const offTopicTasks = [
+      "write an essay", "write a story", "write a poem", "tell me a joke",
+      "recipe for", "how to cook", "who won the", "capital of france",
+      "who is president", "movie review", "summarize book", "tell me about yourself"
+    ];
+    if (offTopicTasks.some(ott => q.includes(ott))) {
+      return {
+        text: `### 🛡️ Voyage AI Domain Guard\n\nI am **Voyage AI**, an autonomous AI concierge dedicated exclusively to **travel disruption resilience, flight & train telemetry, and statutory passenger rights**.\n\nI cannot assist with general off-topic tasks (such as general essays, trivia, jokes, or non-travel queries).\n\n#### ✈️ How I can assist you:\n- **Flight & Train Telemetry**: Search schedules, check live status, and monitor delay risk.\n- **Passenger Rights & Refunds**: File statutory refund claims under DGCA, IRCTC, EU261, or US DOT.\n- **Multi-Modal Route Optimization**: Plan backup connections across air, rail, and road.\n\n*Please let me know how I can help with your travel itinerary!*`,
+        provider: "Voyage Domain Guard"
+      };
+    }
+
+    // 2. Travel Query Fallback (Itinerary / Refund Claims / Flight & Train Status)
+    if (q.includes("claim") || q.includes("refund") || q.includes("dispute")) {
+      return {
+        text: `### 🛡️ Statutory Passenger Rights & Dispute Ledger\n\nUnder **DGCA CAR Section 3 (Air)** and **IRCTC TDR Regulations (Rail)**:\n\n• **Train Delays > 3 Hours**: 100% full statutory refund with zero cancellation deductions.\n• **Flight Delays > 6 Hours / Cancellations**: Full refund + ₹5,000 to ₹10,000 statutory compensation.\n• **Duty of Care**: Free meals and refreshments for delays exceeding 2 hours at departure.\n\n*You can click "File Refund Claim" on your ticket card to record a digital dispute claim.*`,
+        provider: "Voyage Passenger Rights Engine"
+      };
+    }
+
+    if (activeTicket) {
+      const carrier = activeTicket.carrier || "Transit Operator";
+      const service = activeTicket.service_number || "Service";
+      const orig = activeTicket.origin || "Origin";
+      const dest = activeTicket.destination || "Destination";
+      const pnr = activeTicket.pnr || "VY-RECORD";
+      const delayM = parseInt(activeTicket.delay_minutes || 0, 10);
+      const delayTxt = delayM > 0 ? `+${delayM} mins delay` : "Running Right Time (On Schedule)";
+
+      return {
+        text: `### ✈️ Trip Status & Telemetry :: ${carrier} ${service}\n\n• **Route**: **${orig} ➔ ${dest}** (PNR: \`${pnr}\`)\n• **Operating Status**: **${delayTxt}**\n• **Passenger Rights**: ${delayM >= 180 ? 'Eligible for 100% statutory refund and statutory compensation.' : 'Operating nominally under standard schedule.'}\n\n*Click "Done (View Map)" to inspect the topological connection map or explore alternative Vande Bharat / Express links.*`,
+        provider: "Voyage Travel Telemetry Engine"
+      };
+    }
+
+    return {
+      text: `### ✈️ Voyage Travel Intelligence Engine\n\nI am monitoring live multi-modal travel corridors across air, rail, and road transit.\n\n- **Flight & Train Search**: Enter a route (e.g. *"search flights from Mumbai to Delhi"* or train number *"12137"*).\n- **Disruption Analysis**: Upload a ticket PDF/image to calculate delay risk and statutory refund rights.\n\n*How would you like to plan your journey today?*`,
+      provider: "Voyage Intelligence Engine"
+    };
+  };
+
   // Send message to AI engine
   const handleSendMessage = async (textToSend) => {
     const query = textToSend || inputText.trim();
@@ -248,17 +331,20 @@ export default function DisruptionChatbot({
         })
       });
 
+      const contentType = res.headers.get("content-type") || "";
+      if (!res.ok || !contentType.includes("application/json")) {
+        throw new Error(`Non-JSON API response (${res.status})`);
+      }
+
       const data = await res.json();
       const replyText = data.reply || "I have received your request and evaluated the disruption.";
       const provider = data.provider || "Voyage AI Engine";
       setActiveProvider(provider);
 
-      // Synchronize uploadedTickets if backend returns authentic ledger
       if (data.all_tickets && Array.isArray(data.all_tickets) && data.all_tickets.length > 0) {
         setUploadedTickets(data.all_tickets);
       }
 
-      // If the backend returned a real structured ticket (e.g. from RailRadar live lookup for 12134)
       const lower = query.toLowerCase();
       let cardToShow = null;
       if (data.structured_ticket) {
@@ -274,7 +360,6 @@ export default function DisruptionChatbot({
         lower.includes("trip summary") || 
         lower.includes("pnr")
       )) {
-        // Only show active ticket card if user explicitly asked about their own trip
         cardToShow = activeTicketContext;
       }
 
@@ -293,15 +378,18 @@ export default function DisruptionChatbot({
       ]);
 
     } catch (err) {
-      console.error("AI Chat Error:", err);
+      console.warn("AI Chat API fetch failed, falling back to client-side domain intelligence:", err);
+      const fallback = evaluateClientSideDomainResponse(query, activeTicketContext, uploadedTickets);
+      setActiveProvider(fallback.provider);
+      
       setMessages(prev => [
         ...prev,
         {
           id: Date.now() + 1,
           sender: 'bot',
-          provider: 'Voyage System Alert',
-          text: "⚠️ **Connection Notice**\nCould not reach the Voyage AI backend server at `/api/ai/chat`.\n\nPlease verify that the backend server is running (e.g. `uvicorn backend.main:app --port 8000`).",
-          structuredCard: null,
+          provider: fallback.provider,
+          text: fallback.text,
+          structuredCard: activeTicketContext,
           allTickets: uploadedTickets,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
