@@ -86,19 +86,17 @@ export default function Navbar({
             </button>
           </div>
 
-          {/* CENTER: NAV LINKS */}
-          <div className="hidden md:flex items-center gap-6 lg:gap-8">
+          {/* RIGHT: ALL CONTROLS IN THE SAME LINE (Nav Links, Buttons, Language, Profile/Auth) */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            
+            {/* Destinations Link */}
             <button
               onClick={() => scrollTo('#destinations')}
-              className="font-googleSans font-normal text-xs lg:text-sm text-white/85 hover:text-white transition-colors duration-200 whitespace-nowrap cursor-pointer hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]"
+              className="font-googleSans font-normal text-xs sm:text-xs text-white/85 hover:text-white transition-colors duration-200 whitespace-nowrap cursor-pointer hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] px-1 sm:px-2 py-1"
             >
               {t?.destinations || 'Destinations'}
             </button>
-          </div>
 
-          {/* RIGHT: ALL CONTROLS IN THE SAME LINE (Buttons, Language, Profile/Auth) */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            
             {/* Book Now (clean dark outlined pill) */}
             <button
               onClick={handleBookNow}
