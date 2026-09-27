@@ -68,11 +68,11 @@ export default function Navbar({
       {/* UNIFIED SINGLE-LINE NAVBAR (Everything in the SAME LINE as requested)     */}
       {/* No multi-row stacking, pure clean vector logo without stickers!           */}
       {/* ========================================================================= */}
-      <header className="fixed top-4 sm:top-5 left-0 right-0 z-[100] flex justify-center px-3 sm:px-6 pointer-events-none">
-        <nav className="pointer-events-auto w-full max-w-6xl rounded-full px-4 sm:px-6 py-2.5 flex items-center justify-between bg-[#072422]/90 backdrop-blur-xl border border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.5)] transition-all duration-300">
+      <header className="fixed top-3 sm:top-4 left-0 right-0 z-[100] flex justify-center px-3 sm:px-6 pointer-events-none">
+        <nav className="pointer-events-auto w-full max-w-4xl rounded-full px-3.5 sm:px-5 py-1.5 sm:py-2 flex items-center justify-between bg-[#072422]/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300">
           
           {/* LEFT: EXACT UPLOADED VOYAGE LOGO */}
-          <div className="flex items-center shrink-0 pr-4 sm:pr-6">
+          <div className="flex items-center shrink-0 pr-3 sm:pr-4">
             <button
               onClick={() => onNavigate('/')}
               className="flex items-center hover:opacity-90 transition-opacity cursor-pointer"
@@ -81,7 +81,7 @@ export default function Navbar({
               <img 
                 src="/voyage_logo.png" 
                 alt="VOYAGE" 
-                className="h-6 sm:h-7.5 w-auto object-contain"
+                className="h-5 sm:h-6 w-auto object-contain"
               />
             </button>
           </div>
@@ -90,19 +90,19 @@ export default function Navbar({
           <div className="hidden md:flex items-center gap-6 lg:gap-8">
             <button
               onClick={() => scrollTo('#destinations')}
-              className="font-googleSans font-normal text-sm lg:text-[15px] text-white/85 hover:text-white transition-colors duration-200 whitespace-nowrap cursor-pointer hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]"
+              className="font-googleSans font-normal text-xs lg:text-sm text-white/85 hover:text-white transition-colors duration-200 whitespace-nowrap cursor-pointer hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]"
             >
               {t?.destinations || 'Destinations'}
             </button>
           </div>
 
           {/* RIGHT: ALL CONTROLS IN THE SAME LINE (Buttons, Language, Profile/Auth) */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             
             {/* Book Now (clean dark outlined pill) */}
             <button
               onClick={handleBookNow}
-              className="hidden sm:inline-flex px-3.5 sm:px-4 py-1.5 rounded-full border border-white/35 bg-white/10 hover:bg-white/20 text-white font-medium text-xs active:scale-95 transition-all whitespace-nowrap cursor-pointer"
+              className="hidden sm:inline-flex px-3 py-1 rounded-full border border-white/35 bg-white/10 hover:bg-white/20 text-white font-medium text-xs active:scale-95 transition-all whitespace-nowrap cursor-pointer"
             >
               {t?.bookNow || 'Book Now'}
             </button>
@@ -110,19 +110,19 @@ export default function Navbar({
             {/* Resolve Disruption (terracotta filled pill #A35645) */}
             <button
               onClick={handleDisruptionSolving}
-              className="px-3.5 sm:px-4 py-1.5 rounded-full font-bold text-xs text-white bg-[#A35645] hover:bg-[#b8614e] transition-all shadow-md active:scale-95 whitespace-nowrap cursor-pointer"
+              className="px-3 py-1 rounded-full font-bold text-xs text-white bg-[#A35645] hover:bg-[#b8614e] transition-all shadow-md active:scale-95 whitespace-nowrap cursor-pointer"
             >
               {t?.resolveDisruption || 'Resolve Disruption'}
             </button>
 
             {/* Vertical Divider */}
-            <div className="w-px h-4 bg-white/25 hidden sm:block" />
+            <div className="w-px h-3.5 bg-white/25 hidden sm:block" />
 
             {/* Language Switcher Dropdown (EN, Marathi, Hindi) */}
             <div className="relative">
               <button
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="flex items-center gap-1 font-googleSans font-medium text-xs sm:text-sm text-white/90 hover:text-white cursor-pointer px-1 py-1"
+                className="flex items-center gap-1 font-googleSans font-medium text-xs text-white/90 hover:text-white cursor-pointer px-1 py-0.5"
                 aria-label="Select Language"
               >
                 <span>{language?.toUpperCase() || 'EN'}</span>
@@ -130,7 +130,7 @@ export default function Navbar({
               </button>
 
               {langDropdownOpen && (
-                <div className="absolute top-9 right-0 w-36 bg-[#0c2328] border border-white/20 rounded-xl shadow-2xl overflow-hidden py-1 z-50 animate-fadeIn">
+                <div className="absolute top-8 right-0 w-36 bg-[#0c2328] border border-white/20 rounded-xl shadow-2xl overflow-hidden py-1 z-50 animate-fadeIn">
                   {languages.map((l) => (
                     <button
                       key={l.code}
@@ -152,14 +152,14 @@ export default function Navbar({
 
             {/* User Profile Picture (Redirects to /profile) OR Login & Sign Up */}
             {user ? (
-              <div className="flex items-center gap-2 pl-1">
+              <div className="flex items-center gap-1.5 pl-0.5">
                 {/* Clicking profile avatar redirects to /profile */}
                 <button
                   onClick={handleProfileClick}
                   title="View Profile (http://127.0.0.1:8000/profile)"
-                  className="flex items-center gap-2 group cursor-pointer focus:outline-none"
+                  className="flex items-center gap-1.5 group cursor-pointer focus:outline-none"
                 >
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-[#F1A501] to-[#DF6951] text-white flex items-center justify-center font-bold text-xs ring-2 ring-white/30 group-hover:ring-white transition-all shadow-md">
+                  <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full bg-gradient-to-tr from-[#F1A501] to-[#DF6951] text-white flex items-center justify-center font-bold text-xs ring-2 ring-white/30 group-hover:ring-white transition-all shadow-md">
                     {user.name.charAt(0)}
                   </div>
                   <span className="hidden xl:inline text-xs text-white/90 group-hover:text-white font-medium">
