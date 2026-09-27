@@ -228,45 +228,6 @@ export default function ProfilePage({ user, onNavigate, onLogout, t }) {
                   </button>
                 </div>
 
-                {/* Personalize Travel Banner (Styled matching homepage palette) */}
-                <div className="p-4 rounded-2xl bg-[#072422]/5 border border-[#072422]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white border border-[#072422]/20 flex items-center justify-center shrink-0 text-lg shadow-sm">
-                      🧳
-                    </div>
-                    <div>
-                      <div className="font-bold text-xs text-[#181E4B]">
-                        Let's personalize your travel!
-                      </div>
-                      <div className="text-[11px] text-[#5E6282]">
-                        Confirm your City to help us plan better trips for you!
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    <select
-                      value={confirmCity}
-                      onChange={(e) => setConfirmCity(e.target.value)}
-                      className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs bg-white text-[#181E4B] focus:outline-none focus:border-[#DF6951] font-medium"
-                    >
-                      <option value="Mumbai">Mumbai</option>
-                      <option value="Delhi">Delhi</option>
-                      <option value="Bengaluru">Bengaluru</option>
-                      <option value="Kolkata">Kolkata</option>
-                      <option value="Hyderabad">Hyderabad</option>
-                      <option value="Chennai">Chennai</option>
-                      <option value="Jaipur">Jaipur</option>
-                    </select>
-                    <button 
-                      onClick={handleSave}
-                      className="px-4 py-1.5 rounded-xl bg-[#072422] hover:bg-[#0f3d3a] text-white text-xs font-semibold transition-colors cursor-pointer"
-                    >
-                      Confirm City
-                    </button>
-                  </div>
-                </div>
-
                 {/* General Information Section */}
                 <div className="space-y-4 pt-2">
                   <h3 className="text-sm font-bold text-[#181E4B] font-poppins">
